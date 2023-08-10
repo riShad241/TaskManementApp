@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:math';
+import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -18,15 +18,19 @@ class NetworkCaller {
       });
       if(response.statusCode == 200){
        return NetworkResponse(true,response.statusCode, jsonDecode(response.body));
-      }else{
+      }else if(response.statusCode == 401){
+        gotoLogin();
+      }
+      else{
         return NetworkResponse(false,response.statusCode,null);
       }
     } catch(e){
-      log(e.toString() as num);
+      log(e.toString());
     }
     return NetworkResponse(false,-1,null);
   }
-  Future<NetworkResponse> postRequest(String url,Map<String, dynamic> body) async{
+  Future<NetworkResponse> postRequest(String url,Map<String, dynamic> body,
+  {bool isLogin  = false}) async{
     try{
       Response response = await post(Uri.parse(url),
           headers: {
@@ -37,13 +41,15 @@ class NetworkCaller {
       if(response.statusCode == 200){
         return NetworkResponse(true,response.statusCode, jsonDecode(response.body));
       }  else if(response.statusCode == 401){
-
+        if(isLogin){
+          gotoLogin();
+        }
       }
         else{
         return NetworkResponse(false,response.statusCode,null);
       }
     } catch(e){
-      log(e.toString() as num);
+      log(e.toString());
     }
     return NetworkResponse(false,-1,null);
   }
