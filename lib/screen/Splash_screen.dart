@@ -8,6 +8,8 @@ import 'package:real_todo/utilits/assets_utilits.dart';
 import '';
 import 'auth/Login_Screen.dart';
 import 'bottom_nav_base_screen.dart';
+import 'package:get/get.dart';
+
 class Splash_screen extends StatefulWidget {
   const Splash_screen({Key? key}) : super(key: key);
 
@@ -21,26 +23,26 @@ class _Splash_screenState extends State<Splash_screen> {
     super.initState();
     navigatorToLogin();
   }
-  void navigatorToLogin(){
-    Future.delayed(Duration(seconds: 3)).then((value) async {
+
+  void navigatorToLogin() {
+    Future.delayed(const Duration(seconds: 3)).then((value) async {
       final bool islogged = await AuthUtilits.cheakIfuserInfo();
       if (mounted) {
-      Navigator.pushAndRemoveUntil(
-          context, MaterialPageRoute(builder: (context) =>
-      islogged ? const BottomNavbaseScreen() : const LogIn_screen(
-
-      )), (route) => false);
-    }
+        Get.offAll(() =>
+            islogged ? const BottomNavbaseScreen() : const LogIn_screen());
+      }
     });
-
-}
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ScreenBackgroud(child:  Center(
-        child: SvgPicture.asset(utility.logo,width: 90,),
-      ))
-    );
+        body: ScreenBackgroud(
+            child: Center(
+      child: SvgPicture.asset(
+        utility.logo,
+        width: 90,
+      ),
+    )));
   }
 }
