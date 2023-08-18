@@ -1,13 +1,21 @@
 # real_todo is task managment application...
 Ostad Flutter course project
 Features
+
 1.Sing-up and Login
+
 2.Create Task
+
 3.Task screen
+
 4.Update task status
+
 5.Delete task
+
 6.add profile picture
+
 7.Update profile information
+
 8.Password recovery via email verification
 
 
