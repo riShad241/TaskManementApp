@@ -14,22 +14,31 @@ class TaskListTile extends StatelessWidget {
   final Color color;
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(data.title ?? 'Unknown'),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(data.description ?? ''),
-          Text(data.createdDate ?? ''),
-          Row(
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0)
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListTile(
+          title: Text(data.title ?? 'Unknown'),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Chip(label: Text(data.status ?? '$txt',style: TextStyle(fontWeight: FontWeight.bold),),backgroundColor: color,),
-              const Spacer(),
-              IconButton(onPressed: onDeleteTap, icon: Icon(Icons.delete_forever_outlined,color: Colors.red.shade300,)),
-              IconButton(onPressed: onEditTap, icon: Icon(Icons.edit,color: Colors.green.shade300,)),
+              Text(data.description ?? ''),
+              Text(data.createdDate ?? ''),
+              Row(
+                children: [
+                   Chip(label: Text(data.status ?? '$txt',style: TextStyle(fontWeight: FontWeight.bold),),backgroundColor: color,),
+                  const Spacer(),
+                  IconButton(onPressed: onDeleteTap, icon: Icon(Icons.delete_forever_outlined,color: Colors.red.shade300,)),
+                  IconButton(onPressed: onEditTap, icon: Icon(Icons.edit,color: Colors.green.shade300,)),
+                ],
+              )
             ],
-          )
-        ],
+          ),
+        ),
       ),
     );
   }

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:real_todo/data/models/Network_response.dart';
+import 'package:get/get.dart';
+import 'package:real_todo/Widget/background_widget.dart';
 import 'package:real_todo/data/models/Task_list_model.dart';
-import 'package:real_todo/data/services/network_caller.dart';
-import 'package:real_todo/utils/url-.dart';
-
+import 'package:real_todo/screen/state_manegers/InprogressTask_controller.dart';
+import 'package:real_todo/screen/state_manegers/getDelet_controller.dart';
+import 'package:real_todo/screen/state_manegers/new_task_controller.dart';
+import 'package:real_todo/screen/updateTasksheet.dart';
 import '../Widget/TaskListTile.dart';
 import '../Widget/UserprofileBaner.dart';
+import '../Widget/update_task_bottom_sheet.dart';
+
 class In_progress extends StatefulWidget {
   const In_progress({Key? key}) : super(key: key);
 
@@ -14,33 +18,14 @@ class In_progress extends StatefulWidget {
 }
 
 class _In_progressState extends State<In_progress> {
-  bool _getprogressTaskInprogress = false;
-  TaskListModel _taskListModel = TaskListModel();
+  final InprogressController _inprogressController =
+      Get.find<InprogressController>();
 
-  Future<void> getInprogressTask() async{
-    _getprogressTaskInprogress = true;
-    if(mounted){
-      setState(() {});
-    }
-    final NetworkResponse response = 
-        await NetworkCaller().getRequest(Urls.progressTasks);
-    if(response.issuccess){
-      _taskListModel = TaskListModel.fromJson(response.body!);
-    }else{
-      if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("In progress Task get Failed")));
-      }
-    }
-    _getprogressTaskInprogress = false;
-    if(mounted){
-      setState(() {});
-    }
-  }
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      getInprogressTask();
+      _inprogressController.getInprogressTask();
     });
   }
 
@@ -48,23 +33,38 @@ class _In_progressState extends State<In_progress> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            const userProfileBanare(),
-            Expanded(
-              child: _getprogressTaskInprogress ? const Center(child:CircularProgressIndicator() ,) : ListView.separated(
-                itemCount: _taskListModel.data?.length ?? 0,
-                itemBuilder: (context,index){
-                  return  TaskListTile(txt: 'Progress', color: Colors.purple.shade300,
-                    data: _taskListModel.data![index],
-                    onDeleteTap: () {  },
-                    onEditTap: () {  }, );
-                },
-                separatorBuilder: (BuildContext context, int index){
-                  return const Divider();
-                },),
-            )
-          ],
+        child: ScreenBackgroud(
+          child: Column(
+            children: [
+              const userProfileBanare(),
+              GetBuilder<InprogressController>(builder: (_) {
+                if (_inprogressController.inprogress) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return ListView.separated(
+                  shrinkWrap: true,
+                  itemCount:
+                      _inprogressController.tasklistmodel.data?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    return TaskListTile(
+                      txt: 'Progress',
+                      color: Colors.purple.shade300,
+                      data: _inprogressController.tasklistmodel.data![index],
+                      onDeleteTap: () {
+                      },
+                      onEditTap: () {
+                      },
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const Divider();
+                  },
+                );
+              })
+            ],
+          ),
         ),
       ),
     );

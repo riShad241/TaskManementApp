@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:real_todo/Widget/background_widget.dart';
 import 'package:real_todo/data/models/Network_response.dart';
 import 'package:real_todo/data/models/Task_list_model.dart';
 import 'package:real_todo/data/services/network_caller.dart';
@@ -49,23 +50,25 @@ class _CancleState extends State<Cancle> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            userProfileBanare(),
-            Expanded(
-              child: _cancelInprogress ? const Center(child: CircularProgressIndicator(),) : ListView.separated(
-                itemCount: _taskListModel.data?.length ?? 0,
-                itemBuilder: (context,index){
-                  return  TaskListTile(txt: 'Cancel', color: Colors.red.shade300,
-                    data: _taskListModel.data![index],
-                    onDeleteTap: () {  },
-                    onEditTap: () {  },);
-                },
-                separatorBuilder: (BuildContext context, int index){
-                  return const Divider();
-                },),
-            )
-          ],
+        child: ScreenBackgroud(
+          child: Column(
+            children: [
+              userProfileBanare(),
+              Expanded(
+                child: _cancelInprogress ? const Center(child: CircularProgressIndicator(),) : ListView.separated(
+                  itemCount: _taskListModel.data?.length ?? 0,
+                  itemBuilder: (context,index){
+                    return  TaskListTile(txt: 'Cancel', color: Colors.red.shade300,
+                      data: _taskListModel.data![index],
+                      onDeleteTap: () {  },
+                      onEditTap: () {  },);
+                  },
+                  separatorBuilder: (BuildContext context, int index){
+                    return const Divider();
+                  },),
+              )
+            ],
+          ),
         ),
       ),
     );

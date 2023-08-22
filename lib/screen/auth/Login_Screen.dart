@@ -100,12 +100,13 @@ class _LogIn_screenState extends State<LogIn_screen> {
                                   }
                                   loginController.login(
                                       _EmailTEController.text.trim(),
-                                      _passwordTEController.text
-                                  ).then((result) {
-                                    if(result == true){
+                                          _passwordTEController.text)
+                                      .then((result) {
+                                    if (result == true) {
                                       Get.offAll(BottomNavbaseScreen());
-                                    }else{
-                                      Get.snackbar('Failed', 'LogIn failed! Try again.');
+                                    } else {
+                                      Get.snackbar(
+                                          'Failed', 'LogIn failed! Try again.');
                                     }
                                   });
                                 },

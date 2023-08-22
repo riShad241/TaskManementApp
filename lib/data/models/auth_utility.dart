@@ -11,6 +11,11 @@ class AuthUtilits{
     await _shearpfe.setString('user-data', jsonEncode(model.toJson()));
     userinfo = model;
   }
+  static Future<void> UpdateUserInfo(UserData data) async{
+    SharedPreferences _shearpfe = await SharedPreferences.getInstance();
+    userinfo.data = data;
+    await _shearpfe.setString('user-data', jsonEncode(userinfo.toJson()));
+  }
   static Future<LoginModel> getuserInfo() async{
     SharedPreferences _shearpfe = await SharedPreferences.getInstance();
     String value = _shearpfe.getString('user-data')!;

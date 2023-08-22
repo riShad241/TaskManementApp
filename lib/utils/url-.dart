@@ -17,4 +17,9 @@ class Urls {
   static String sendOtpToEmail(String email) => '$baseUrl/RecoverVerifyEmail/$email';
   static String otpVerify(String email, String otp) => '$baseUrl/RecoverVerifyOTP/$email/$otp';
   static String resetPassword = '$baseUrl/RecoverResetPass';
+  static String recoveryEmailUrl = '$baseUrl/RecoverVerifyEmail/'; //email address
+  static String recoveryOTPUrl = '$baseUrl/RecoverVerifyOTP/'; //email address // otp
+  static String setPasswordUrl = '$baseUrl/RecoverResetPass';
+
+  static String profileUpdateUrl = '$baseUrl/profileUpdate';
 }

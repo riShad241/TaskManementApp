@@ -1,89 +1,162 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:real_todo/Widget/background_widget.dart';
 import 'package:real_todo/screen/auth/resat_password.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
+import '../../data/models/Network_response.dart';
+import '../../data/services/network_caller.dart';
+import '../../utils/url-.dart';
 import 'Login_Screen.dart';
-class Otp_validation extends StatelessWidget {
-  const Otp_validation({Key? key}) : super(key: key);
+class otp_varification extends StatefulWidget {
+  const otp_varification({super.key, required this.emailAddress});
+
+  final String emailAddress;
+
+  @override
+  State<otp_varification> createState() => _otp_varificationState();
+}
+
+class _otp_varificationState extends State<otp_varification> {
+  bool _isLoading = false;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _pinCodeTEController = TextEditingController();
+
+  Future<void> verifyEmailWithPin() async {
+    if(!_formKey.currentState!.validate()) {
+      return;
+    }
+    FocusScope.of(context).unfocus();
+
+    _isLoading = true;
+    if(mounted) {
+      setState(() {});
+    }
+
+    final String responseUrl = Urls.recoveryOTPUrl + widget.emailAddress + '/'+ _pinCodeTEController.text;
+    final NetworkResponse response = await NetworkCaller().getRequest(responseUrl);
+
+    log(responseUrl);
+
+    _isLoading = false;
+    if(mounted) {
+      setState(() {});
+    }
+
+    if(_pinCodeTEController.value.text.length == 6 && mounted) {
+      Map<String, dynamic> decodedResponse = jsonDecode(jsonEncode(response.body));
+      if(response.issuccess) {
+        if(decodedResponse['status'] == 'success') {
+
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Set new password'),
+          ));
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Resat_password(
+                  emailAddress: widget.emailAddress,
+                  otpCode: _pinCodeTEController.text,
+                )), (route) => false,
+          );
+        }
+        else {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Pin code didn't match. Try again!"),
+            backgroundColor: Colors.red,
+          ));
+        }
+      }
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Verification Error!'),
+          backgroundColor: Colors.red,
+        ));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Fill full code!'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:  ScreenBackgroud(
-        child: SafeArea(
-          child: SingleChildScrollView(
+        body: ScreenBackgroud(
+          child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 64,),
-                  Text('PIN Verification',style:  Theme.of(context).textTheme.titleLarge,),
-                  const SizedBox(height: 4,),
-                  Text("A 6 digit pin will sent to your email address",
-                    style: Theme.of(context).textTheme.bodyMedium
-                    ?.copyWith(color: Colors.grey),
+                  const Text('PIN Verification',
+                  style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold,color: Colors.black),
+                  ),
+                  const SizedBox(height: 6,),
+                  const Text('A 6 digit verification pin will send to your email address',
+                   style: TextStyle(fontSize: 15,color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16,),
+                  Form(
+                    key: _formKey,
+                    child: PinCodeTextField(
+                      controller: _pinCodeTEController,
+                      appContext: context,
+                      length: 6,
+                      keyboardType: TextInputType.number,
+                      pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          borderRadius: BorderRadius.circular(5),
+                          borderWidth: 0.5,
+                          fieldHeight: 50,
+                          fieldWidth: 40,
+                          activeFillColor: Colors.white
+                      ),
+                      backgroundColor: Colors.white,
+                      animationType: AnimationType.scale,
+                      onEditingComplete: verifyEmailWithPin,
                     ),
-                  const SizedBox(height: 15,),
-                  PinCodeTextField(
-                    keyboardType: TextInputType.number,
-                    length: 6,
-                    obscureText: false,
-                    animationType: AnimationType.fade,
-                    pinTheme: PinTheme(
-                      shape: PinCodeFieldShape.box,
-                      borderRadius: BorderRadius.circular(5),
-                      fieldHeight: 50,
-                      fieldWidth: 40,
-                      activeFillColor: Colors.white,
-                      inactiveFillColor: Colors.white,
-                      inactiveColor: Colors.red,
-                      activeColor: Colors.white,
-                      selectedFillColor: Colors.white,
-                      selectedColor: Colors.green,
-
-                    ),
-                    animationDuration: Duration(milliseconds: 300),
-                    backgroundColor: Colors.white,
-                    enableActiveFill: true,
-                    cursorColor: Colors.green,
-                    enablePinAutofill: true,
-                    onCompleted: (v) {
-                      print("Completed");
-                    },
-                    onChanged: (value) {
-                    },
-                    beforeTextPaste: (text) {
-                      print("Allowing to paste $text");
-                      //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
-                      //but you can show anything you want here, like your pop up saying wrong paste format or etc
-                      return true;
-                    }, appContext: context,
                   ),
-                  const SizedBox(
-                    height: 24,
+                  const SizedBox(height: 16,),
+                  Visibility(
+                    visible: _isLoading == false,
+                    child:
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: verifyEmailWithPin,
+                            child: const Text('Verify'),
+                          ),
+                        ),
                   ),
-                  SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(onPressed: (){
-                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> Resat_password()),
-                                (route) => false);
-                      }, child: Text("Verify"))),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Don't have an account"),
-                      TextButton(onPressed: (){Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> LogIn_screen()),
-                              (route) => false);}, child: const Text("Sing in"))
-                    ],
-                  ),
+                  signInButton(context)
                 ],
               ),
             ),
           ),
+        )
+    );
+  }
+
+  Row signInButton(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text("Have account? "),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Sign In'),
         ),
-      ),
+      ],
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:real_todo/MyApp.dart';
@@ -56,5 +55,6 @@ class NetworkCaller {
   Future<void> gotoLogin() async {
     await AuthUtilits.clearUserInfo();
      Navigator.pushAndRemoveUntil(MyApp.globalKey.currentContext!, MaterialPageRoute(builder: (context)=>const LogIn_screen()), (route) => false);
+
   }
 }
